@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,17 +9,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:padding="16dp">
-
-        <Button
-            android:id="@+id/button_first"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="MY PLAYLIST"
-            app:layout_constraintTop_toBottomOf="@id/search_bar"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
 
         <!-- Search Bar -->
         <androidx.appcompat.widget.SearchView
@@ -32,16 +24,42 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginBottom="16dp" />
 
+        <!-- Upload Audio Button -->
+        <Button
+            android:id="@+id/uploadAudioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Upload Audio"
+            app:layout_constraintTop_toBottomOf="@id/search_bar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/button_first"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            android:layout_marginTop="16dp" />
+
+        <!-- My Playlist Button -->
+        <Button
+            android:id="@+id/button_first"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MY PLAYLIST"
+            app:layout_constraintTop_toBottomOf="@id/search_bar"
+            app:layout_constraintStart_toEndOf="@+id/uploadAudioButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            android:layout_marginTop="16dp" />
+
+        <!-- Welcome Text -->
         <TextView
             android:id="@+id/textview_first"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:text="Welcome and be your own DJ"
-            app:layout_constraintTop_toBottomOf="@id/button_first"
+            app:layout_constraintTop_toBottomOf="@id/uploadAudioButton"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:layout_marginTop="16dp" />
 
+        <!-- RecyclerView -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="0dp"
@@ -50,7 +68,7 @@
             app:layout_constraintTop_toBottomOf="@id/textview_first"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            />
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>
