@@ -9,6 +9,8 @@ import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import com.example.trimmix.databinding.FragmentFirstBinding
 import androidx.appcompat.widget.SearchView
+import androidx.recyclerview.widget.GridLayoutManager
+
 
 
 /**
@@ -38,7 +40,9 @@ class FirstFragment : Fragment() {
         binding.buttonFirst.setOnClickListener {
             findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
         }
+
         setupSearchView()
+        setupRecyclerView()
     }
 
     private fun setupSearchView() {
@@ -60,6 +64,19 @@ class FirstFragment : Fragment() {
                 return true
             }
         })
+    }
+
+
+    private fun setupRecyclerView() {
+        // Set up the RecyclerView
+        val recyclerView = binding.recyclerView // Assuming your RecyclerView ID is `recyclerView`
+
+        // Use GridLayoutManager with 2 columns
+        recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
+
+        // Set up the adapter with sample data
+        val sampleData = List(20) { "Item ${it + 1}" } // Generates a list of 20 items
+        recyclerView.adapter = MyAdapter(sampleData)
     }
 
     override fun onDestroyView() {
