@@ -14,7 +14,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.trimmix.databinding.FragmentFirstBinding
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.GridLayoutManager
-
+import com.arthenica.ffmpegkit.FFmpegKit
 
 
 /**
@@ -113,6 +113,17 @@ class FirstFragment : Fragment() {
         mediaPlayer.start()
         Toast.makeText(requireContext(), "Playing audio...", Toast.LENGTH_SHORT).show()
     }
+    private fun trimAudio(inputPath: String, outputPath: String, startTime: String, duration: String) {
+        val command = "-i $inputPath -ss $startTime -t $duration -c copy $outputPath"
+        FFmpegKit.execute(command).apply {
+            if (returnCode.isValueSuccess) {
+                Toast.makeText(requireContext(), "Audio trimmed successfully!", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(requireContext(), "Audio trimming failed!", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
