@@ -13,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.findNavController
 import com.example.trimmix.databinding.FragmentFirstBinding
 import androidx.appcompat.widget.SearchView
-import androidx.recyclerview.widget.GridLayoutManager
 import com.arthenica.ffmpegkit.FFmpegKit
 
 
@@ -23,19 +22,17 @@ import com.arthenica.ffmpegkit.FFmpegKit
 class FirstFragment : Fragment() {
 
     private var _binding: FragmentFirstBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
+
+    private val PICK_AUDIO_REQUEST_CODE = 1
+    private val audioList = mutableListOf<String>() // Store uploaded audio files
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         _binding = FragmentFirstBinding.inflate(inflater, container, false)
         return binding.root
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -50,7 +47,7 @@ class FirstFragment : Fragment() {
         }
 
         setupSearchView()
-        setupRecyclerView()
+//        setupRecyclerView()
     }
 
     private fun setupSearchView() {
@@ -75,19 +72,7 @@ class FirstFragment : Fragment() {
     }
 
 
-    private fun setupRecyclerView() {
-        // Set up the RecyclerView
-        val recyclerView = binding.recyclerView // Assuming your RecyclerView ID is `recyclerView`
 
-        // Use GridLayoutManager with 2 columns
-        recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
-
-        // Set up the adapter with sample data
-        val sampleData = List(20) { "Item ${it + 1}" } // Generates a list of 20 items
-        recyclerView.adapter = MyAdapter(sampleData)
-    }
-
-    private val PICK_AUDIO_REQUEST_CODE = 1
 
     private fun uploadAudio() {
         val intent = Intent(Intent.ACTION_GET_CONTENT)
@@ -99,11 +84,26 @@ class FirstFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PICK_AUDIO_REQUEST_CODE && resultCode == AppCompatActivity.RESULT_OK) {
             data?.data?.let { uri ->
-                // Handle the selected audio URI
-                Toast.makeText(requireContext(), "Audio Selected: $uri", Toast.LENGTH_SHORT).show()
+                // Display the selected audio file name
+                val fileName = uri.lastPathSegment ?: "Unknown File"
+                binding.audioFileName.text = fileName
+
+                Toast.makeText(requireContext(), "Audio Selected: $fileName", Toast.LENGTH_SHORT).show()
                 playAudio(uri)
             }
         }
+    }
+
+
+    private fun getFileName(uri: Uri): String {
+        var name = "Unknown"
+        requireContext().contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                val nameIndex = cursor.getColumnIndexOrThrow("_display_name")
+                name = cursor.getString(nameIndex)
+            }
+        }
+        return name
     }
 
     private fun playAudio(audioUri: Uri) {
@@ -111,19 +111,8 @@ class FirstFragment : Fragment() {
         mediaPlayer.setDataSource(requireContext(), audioUri)
         mediaPlayer.prepare()
         mediaPlayer.start()
-        Toast.makeText(requireContext(), "Playing audio...", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), "Playing: ${getFileName(audioUri)}", Toast.LENGTH_SHORT).show()
     }
-    private fun trimAudio(inputPath: String, outputPath: String, startTime: String, duration: String) {
-        val command = "-i $inputPath -ss $startTime -t $duration -c copy $outputPath"
-        FFmpegKit.execute(command).apply {
-            if (returnCode.isValueSuccess) {
-                Toast.makeText(requireContext(), "Audio trimmed successfully!", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(requireContext(), "Audio trimming failed!", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
 
     override fun onDestroyView() {
         super.onDestroyView()
