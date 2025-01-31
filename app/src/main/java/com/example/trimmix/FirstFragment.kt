@@ -14,6 +14,8 @@ import androidx.navigation.fragment.findNavController
 import com.example.trimmix.databinding.FragmentFirstBinding
 import androidx.appcompat.widget.SearchView
 import com.arthenica.ffmpegkit.FFmpegKit
+import android.provider.OpenableColumns
+
 
 
 /**
@@ -84,8 +86,8 @@ class FirstFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PICK_AUDIO_REQUEST_CODE && resultCode == AppCompatActivity.RESULT_OK) {
             data?.data?.let { uri ->
-                // Display the selected audio file name
-                val fileName = uri.lastPathSegment ?: "Unknown File"
+                // Use the getFileName method to ensure consistency
+                val fileName = getFileName(uri)
                 binding.audioFileName.text = fileName
 
                 Toast.makeText(requireContext(), "Audio Selected: $fileName", Toast.LENGTH_SHORT).show()
@@ -95,15 +97,31 @@ class FirstFragment : Fragment() {
     }
 
 
-    private fun getFileName(uri: Uri): String {
-        var name = "Unknown"
-        requireContext().contentResolver.query(uri, null, null, null, null)?.use { cursor ->
-            if (cursor.moveToFirst()) {
-                val nameIndex = cursor.getColumnIndexOrThrow("_display_name")
-                name = cursor.getString(nameIndex)
+
+    fun getFileName(uri: Uri): String {
+        var fileName = "Unknown"  // Default name if nothing is found
+
+        // Check if the URI has a content scheme (for content providers)
+        if (uri.scheme == "content") {
+            val cursor = requireContext().contentResolver.query(uri, null, null, null, null)
+            cursor?.let {
+                if (it.moveToFirst()) {
+                    // Try to get the display name (file name)
+                    val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                    if (nameIndex != -1) {
+                        fileName = it.getString(nameIndex)
+                    }
+                }
+                it.close()
             }
         }
-        return name
+        // Check if the URI has a file scheme (for file system paths)
+        else if (uri.scheme == "file") {
+            fileName = uri.lastPathSegment ?: "Unknown"
+        }
+
+        // Return the file name
+        return fileName
     }
 
     private fun playAudio(audioUri: Uri) {
