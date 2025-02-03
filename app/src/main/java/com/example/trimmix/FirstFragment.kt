@@ -126,22 +126,27 @@ class FirstFragment : Fragment() {
     }
 
     private fun playAudio(audioUri: Uri) {
-        val fileName = getFileName(audioUri)
+        try {
+            val fileName = getFileName(audioUri)
 
-        // Save the recently played song
-        saveRecentSong(fileName, audioUri.toString())
+            // Save the recently played song
+            saveRecentSong(fileName, audioUri.toString())
 
-        val mediaPlayer = MediaPlayer()
-        mediaPlayer.setDataSource(requireContext(), audioUri)
-        mediaPlayer.prepare()
-        mediaPlayer.start()
+            val mediaPlayer = MediaPlayer()
+            mediaPlayer.setDataSource(requireContext(), audioUri)
+            mediaPlayer.prepare()
+            mediaPlayer.start()
 
-        Toast.makeText(requireContext(), "Playing: $fileName", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Playing: $fileName", Toast.LENGTH_SHORT).show()
 
-        // Refresh the list
-        loadRecentSongs()
+            // Refresh the list
+            loadRecentSongs()
+
+        } catch (e: Exception) {
+            e.printStackTrace() // Log the exception
+            Toast.makeText(requireContext(), "Error playing audio", Toast.LENGTH_SHORT).show()
+        }
     }
-
     private fun saveRecentSong(fileName: String, uri: String) {
         val sharedPreferences = requireContext().getSharedPreferences("RecentSongs", AppCompatActivity.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
