@@ -15,7 +15,7 @@ import com.example.trimmix.databinding.FragmentFirstBinding
 import androidx.appcompat.widget.SearchView
 import com.arthenica.ffmpegkit.FFmpegKit
 import android.provider.OpenableColumns
-
+import androidx.recyclerview.widget.LinearLayoutManager
 
 
 /**
@@ -49,8 +49,9 @@ class FirstFragment : Fragment() {
         }
 
         setupSearchView()
-//        setupRecyclerView()
+        loadRecentSongs() // Load recent songs when fragment starts
     }
+
 
     private fun setupSearchView() {
         val searchView = binding.searchBar // Assuming the search bar is bound in your layout XML
@@ -125,12 +126,54 @@ class FirstFragment : Fragment() {
     }
 
     private fun playAudio(audioUri: Uri) {
+        val fileName = getFileName(audioUri)
+
+        // Save the recently played song
+        saveRecentSong(fileName, audioUri.toString())
+
         val mediaPlayer = MediaPlayer()
         mediaPlayer.setDataSource(requireContext(), audioUri)
         mediaPlayer.prepare()
         mediaPlayer.start()
-        Toast.makeText(requireContext(), "Playing: ${getFileName(audioUri)}", Toast.LENGTH_SHORT).show()
+
+        Toast.makeText(requireContext(), "Playing: $fileName", Toast.LENGTH_SHORT).show()
+
+        // Refresh the list
+        loadRecentSongs()
     }
+
+    private fun saveRecentSong(fileName: String, uri: String) {
+        val sharedPreferences = requireContext().getSharedPreferences("RecentSongs", AppCompatActivity.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+
+        val songsList = getRecentSongs().toMutableList() // Get current list
+        songsList.add(0, "$fileName|$uri") // Add new song at the top
+
+        if (songsList.size > 5) songsList.removeAt(songsList.size - 1) // Keep max 5 songs
+
+        editor.putStringSet("recent_songs", songsList.toSet()) // Save updated list
+        editor.apply()
+    }
+
+
+    private fun getRecentSongs(): List<String> {
+        val sharedPreferences = requireContext().getSharedPreferences("RecentSongs", AppCompatActivity.MODE_PRIVATE)
+        return sharedPreferences.getStringSet("recent_songs", emptySet())?.toList() ?: emptyList()
+    }
+
+
+    private fun loadRecentSongs() {
+        val recentSongs = getRecentSongs()
+
+        binding.recentSongsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        val adapter = RecentSongsAdapter(recentSongs) { songUri ->
+            playAudio(Uri.parse(songUri)) // Play song when clicked
+        }
+
+        binding.recentSongsRecyclerView.adapter = adapter
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
