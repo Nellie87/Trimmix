@@ -123,7 +123,7 @@ class FirstFragment : Fragment() {
 
 
     private fun searchSpotify(query: String) {
-        val authorizationToken = "Bearer"
+        val authorizationToken = "Bearer BQCjQzhjR9JYvYSS-Z_m8BdpnZp1euxeOfCRUlCRu3UeKiO61ljcTCsgqZSLcj1gfRfgsK2e0kZflBkW4l7fZGelaWLN5qyoUIL09L30uJ8a3SnhsbstmSh_u1G2a68Td2caT7uvBDE"
         // Ensure "Bearer " is prefixed
 
         RetrofitClient.spotifyApiService.searchMusic(authorizationToken, query)
