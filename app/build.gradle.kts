@@ -50,5 +50,13 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    implementation("com.arthenica:ffmpeg-kit-full:5.1")// for editing and clipping audios
+//    implementation("com.arthenica:ffmpeg-kit-full:5.1")// for editing and clipping audios
+    // Retrofit for network calls
+    implementation(libs.retrofit)
+    implementation(libs.gson)
+
+    // OkHttp for logging
+    implementation(libs.loggingInterceptor)
+    implementation(libs.retrofit.gson)
+    implementation(libs.okhttp.logging)
 }

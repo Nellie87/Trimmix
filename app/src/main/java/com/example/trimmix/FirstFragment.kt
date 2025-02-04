@@ -13,9 +13,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.findNavController
 import com.example.trimmix.databinding.FragmentFirstBinding
 import androidx.appcompat.widget.SearchView
-import com.arthenica.ffmpegkit.FFmpegKit
+//import com.arthenica.ffmpegkit.FFmpegKit
 import android.provider.OpenableColumns
 import androidx.recyclerview.widget.LinearLayoutManager
+//import com.example.trimmix.network.NetworkService
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+//import com.example.trimmix.network.RetrofitClient
+//import com.example.trimmix.network.SpotifySearchResponse
+
+
 
 
 /**
@@ -25,6 +33,10 @@ class FirstFragment : Fragment() {
 
     private var _binding: FragmentFirstBinding? = null
     private val binding get() = _binding!!
+
+
+    private val networkService = NetworkService() // NetworkService instance
+
 
     private val PICK_AUDIO_REQUEST_CODE = 1
     private val audioList = mutableListOf<String>() // Store uploaded audio files
@@ -40,13 +52,24 @@ class FirstFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+
         binding.buttonFirst.setOnClickListener {
             findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
         }
 
         binding.uploadAudioButton.setOnClickListener {
+            networkService.getAccessToken { accessToken ->
+                if (accessToken != null) {
+                    Toast.makeText(requireContext(), "Access Token: $accessToken", Toast.LENGTH_LONG).show()
+                    searchSpotifyMusic(accessToken)
+                } else {
+                    Toast.makeText(requireContext(), "Error fetching token", Toast.LENGTH_SHORT).show()
+                }
+            }
             uploadAudio()
         }
+
 
         setupSearchView()
         loadRecentSongs() // Load recent songs when fragment starts
@@ -59,20 +82,76 @@ class FirstFragment : Fragment() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 // Handle query submission
-                Toast.makeText(requireContext(), "Searching for: $query", Toast.LENGTH_SHORT).show()
+                if (!query.isNullOrEmpty()) {
+                    searchSpotify(query)
+                }
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                // Handle real-time query text change
-                if (!newText.isNullOrEmpty()) {
-                    Toast.makeText(requireContext(), "Searching for: $newText", Toast.LENGTH_SHORT)
-                        .show()
-                }
+                // Optionally handle real-time query text change
                 return true
             }
         })
     }
+
+    private fun searchSpotifyMusic(accessToken: String) {
+        // Create the search query
+        val query = "Beatles" // Example: Search for music by Beatles
+
+        // Make the API call
+        RetrofitClient.spotifyApiService.searchMusic("Bearer $accessToken", query)
+            .enqueue(object : retrofit2.Callback<SpotifySearchResponse> {
+                override fun onResponse(
+                    call: Call<SpotifySearchResponse>,
+                    response: retrofit2.Response<SpotifySearchResponse>
+                ) {
+                    if (response.isSuccessful) {
+                        val searchResults = response.body()
+                        // Process the search results (display them, etc.)
+                        Toast.makeText(requireContext(), "Search Results: ${searchResults?.tracks?.items?.size}", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(requireContext(), "Error: ${response.code()}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<SpotifySearchResponse>, t: Throwable) {
+                    Toast.makeText(requireContext(), "API Call Failed: ${t.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
+    }
+
+
+    private fun searchSpotify(query: String) {
+        val authorizationToken = "Bearer"
+        // Ensure "Bearer " is prefixed
+
+        RetrofitClient.spotifyApiService.searchMusic(authorizationToken, query)
+            .enqueue(object : Callback<SpotifySearchResponse> {
+                override fun onResponse(call: Call<SpotifySearchResponse>, response: Response<SpotifySearchResponse>) {
+                    if (response.isSuccessful) {
+                        val tracks = response.body()?.tracks?.items
+                        displayTracks(tracks)
+                    } else {
+                        Toast.makeText(requireContext(), "Error fetching results", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<SpotifySearchResponse>, t: Throwable) {
+                    Toast.makeText(requireContext(), "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
+    }
+
+
+
+    private fun displayTracks(tracks: List<Track>?) {
+        // Display the tracks in your RecyclerView or any other UI component
+        if (tracks != null) {
+            // Update your adapter to display these tracks
+        }
+    }
+
 
 
 
@@ -125,6 +204,8 @@ class FirstFragment : Fragment() {
         return fileName
     }
 
+    private var mediaPlayer: MediaPlayer? = null
+
     private fun playAudio(audioUri: Uri) {
         try {
             val fileName = getFileName(audioUri)
@@ -132,21 +213,27 @@ class FirstFragment : Fragment() {
             // Save the recently played song
             saveRecentSong(fileName, audioUri.toString())
 
-            val mediaPlayer = MediaPlayer()
-            mediaPlayer.setDataSource(requireContext(), audioUri)
-            mediaPlayer.prepare()
-            mediaPlayer.start()
+            mediaPlayer?.release() // Release previous MediaPlayer instance
+            mediaPlayer = MediaPlayer().apply {
+                setDataSource(requireContext(), audioUri)
+                prepare()
+                start()
+                setOnCompletionListener {
+                    release()
+                    mediaPlayer = null
+                }
+            }
 
             Toast.makeText(requireContext(), "Playing: $fileName", Toast.LENGTH_SHORT).show()
-
-            // Refresh the list
             loadRecentSongs()
-
         } catch (e: Exception) {
-            e.printStackTrace() // Log the exception
+            e.printStackTrace()
             Toast.makeText(requireContext(), "Error playing audio", Toast.LENGTH_SHORT).show()
         }
     }
+
+
+
     private fun saveRecentSong(fileName: String, uri: String) {
         val sharedPreferences = requireContext().getSharedPreferences("RecentSongs", AppCompatActivity.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
@@ -165,6 +252,7 @@ class FirstFragment : Fragment() {
         val sharedPreferences = requireContext().getSharedPreferences("RecentSongs", AppCompatActivity.MODE_PRIVATE)
         return sharedPreferences.getStringSet("recent_songs", emptySet())?.toList() ?: emptyList()
     }
+
 
 
     private fun loadRecentSongs() {
