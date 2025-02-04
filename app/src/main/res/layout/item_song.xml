@@ -3,32 +3,38 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="8dp">
+    android:padding="8dp"
+    android:background="#ffffff"
+    android:layout_marginBottom="4dp">
 
     <ImageView
         android:id="@+id/albumImage"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:scaleType="centerCrop"/>
+        android:scaleType="centerCrop"
+        android:layout_gravity="center_vertical" />  <!-- Optional: Align vertically center -->
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:paddingStart="8dp">
+        android:paddingStart="8dp"
+        android:gravity="center_vertical"> <!-- Optional: Center vertically -->
 
         <TextView
             android:id="@+id/songTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Song Title"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:textColor="#000000" /> <!-- Optional: Text color -->
 
         <TextView
             android:id="@+id/artistName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Artist Name"/>
+            android:text="Artist Name"
+            android:textColor="#757575" /> <!-- Optional: Lighter text color for artist name -->
     </LinearLayout>
 </LinearLayout>
