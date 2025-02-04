@@ -59,4 +59,7 @@ dependencies {
     implementation(libs.loggingInterceptor)
     implementation(libs.retrofit.gson)
     implementation(libs.okhttp.logging)
+
+    implementation(libs.glide)  // Reference Glide dependency
+    annotationProcessor(libs.glideCompiler)  // Reference Glide compiler
 }

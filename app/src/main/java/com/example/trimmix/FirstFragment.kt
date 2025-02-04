@@ -123,15 +123,14 @@ class FirstFragment : Fragment() {
 
 
     private fun searchSpotify(query: String) {
-        val authorizationToken = "Bearer BQCjQzhjR9JYvYSS-Z_m8BdpnZp1euxeOfCRUlCRu3UeKiO61ljcTCsgqZSLcj1gfRfgsK2e0kZflBkW4l7fZGelaWLN5qyoUIL09L30uJ8a3SnhsbstmSh_u1G2a68Td2caT7uvBDE"
-        // Ensure "Bearer " is prefixed
+        val authorizationToken = "Bearer BQCgti1Kjw-fDTX1o2yp5g3wZJHKoZDwOW-_brlrcWAzkc2Mly0TwvnaY4anBK6zL0aPchjPF6ssZYiLARtL40Z_txJkdFBukKldDSSAiNo7DlLwTrXs1KiJMJURoKeABwA6dok0lVI"
 
         RetrofitClient.spotifyApiService.searchMusic(authorizationToken, query)
             .enqueue(object : Callback<SpotifySearchResponse> {
                 override fun onResponse(call: Call<SpotifySearchResponse>, response: Response<SpotifySearchResponse>) {
                     if (response.isSuccessful) {
-                        val tracks = response.body()?.tracks?.items
-                        displayTracks(tracks)
+                        val tracks = response.body()?.tracks?.items ?: emptyList()
+                        updateSearchResults(tracks)
                     } else {
                         Toast.makeText(requireContext(), "Error fetching results", Toast.LENGTH_SHORT).show()
                     }
@@ -142,6 +141,15 @@ class FirstFragment : Fragment() {
                 }
             })
     }
+
+    private fun updateSearchResults(tracks: List<Track>) {
+        val adapter = SearchResultsAdapter(tracks) { track ->
+            Toast.makeText(requireContext(), "Selected: ${track.name}", Toast.LENGTH_SHORT).show()
+            // Handle song selection (e.g., play a preview)
+        }
+        binding.searchResultsRecyclerView.adapter = adapter
+    }
+
 
 
 
