@@ -15,6 +15,7 @@ import com.example.trimmix.databinding.FragmentFirstBinding
 import androidx.appcompat.widget.SearchView
 //import com.arthenica.ffmpegkit.FFmpegKit
 import android.provider.OpenableColumns
+import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
 //import com.example.trimmix.network.NetworkService
 import retrofit2.Call
@@ -129,7 +130,7 @@ class FirstFragment : Fragment() {
 
 
     private fun searchSpotify(query: String) {
-        val authorizationToken = " "
+        val authorizationToken = "Bearer BQDBxA1X-ltDqTHihy9M-kSn2_Hmn97rXW2ucp9GEtgz8NYAc3O7diNqv9cqlYqVaiKYTAGC-wge4jabNpLasnI4TS2lxZBXlgwLhm1i6opvy3dn7B8AOUuNl3VYsQB550NYZhCpQM4"
         RetrofitClient.spotifyApiService.searchMusic(authorizationToken, query)
             .enqueue(object : Callback<SpotifySearchResponse> {
                 override fun onResponse(call: Call<SpotifySearchResponse>, response: Response<SpotifySearchResponse>) {
@@ -222,31 +223,43 @@ class FirstFragment : Fragment() {
 
     private var mediaPlayer: MediaPlayer? = null
 
-    private fun playAudio(audioUri: Uri) {
+    private fun playAudio(audioUri: Uri?) {
+        if (audioUri == null) {
+            // Fallback to a default audio or show an error message
+            Toast.makeText(requireContext(), "Audio not available", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         try {
             val fileName = getFileName(audioUri)
 
-            // Save the recently played song
-            saveRecentSong(fileName, audioUri.toString())
+            Log.d("FirstFragment", "Playing audio: $fileName, URI: $audioUri")
 
-            mediaPlayer?.release() // Release previous MediaPlayer instance
+            mediaPlayer?.release()
             mediaPlayer = MediaPlayer().apply {
                 setDataSource(requireContext(), audioUri)
                 prepare()
                 start()
+
+                Log.d("FirstFragment", "Audio started: $fileName")
+
                 setOnCompletionListener {
                     release()
                     mediaPlayer = null
+                    Log.d("FirstFragment", "Audio playback completed: $fileName")
                 }
             }
 
             Toast.makeText(requireContext(), "Playing: $fileName", Toast.LENGTH_SHORT).show()
             loadRecentSongs()
+
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e("FirstFragment", "Error playing audio", e)
             Toast.makeText(requireContext(), "Error playing audio", Toast.LENGTH_SHORT).show()
         }
     }
+
+
 
 
 

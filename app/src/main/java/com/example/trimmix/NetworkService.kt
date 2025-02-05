@@ -7,8 +7,8 @@ import java.io.IOException
 
 class NetworkService {
 
-    private val clientId = " "
-    private val clientSecret = " "
+    private val clientId = "2743767e85b244ce8edf99e4840fa812"
+    private val clientSecret = "416a2db1bd91484ab0198567e7d05548"
 
     private val okHttpClient = OkHttpClient()
 

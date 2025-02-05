@@ -1,10 +1,12 @@
 package com.example.trimmix
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 
@@ -30,12 +32,28 @@ class SearchResultsAdapter(
         holder.songTitle.text = song.name
         holder.artistName.text = song.artists.joinToString { it.name }
 
+        Log.d("API Response", "Song Data: $song")
+
+
+
+
         // Load album image using Glide
         Glide.with(holder.itemView.context)
             .load(song.album.images.firstOrNull()?.url)
             .into(holder.albumImage)
 
-        holder.itemView.setOnClickListener { onSongClick(song) }
+        holder.itemView.setOnClickListener {
+            Log.d("SearchResultsAdapter", "Song clicked: ${song.name}, Preview URL: ${song.preview_url}")
+
+            if (song.preview_url != null) {
+                // Proceed with playing the audio
+                onSongClick(song)
+            } else {
+                // Handle the case where there is no preview URL (e.g., show a message)
+                Toast.makeText(holder.itemView.context, "Preview URL not available for ${song.name}", Toast.LENGTH_SHORT).show()
+            }
+        }
+
     }
 
     override fun getItemCount(): Int = songs.size
