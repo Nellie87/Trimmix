@@ -61,12 +61,18 @@ class FirstFragment : Fragment() {
         binding.uploadAudioButton.setOnClickListener {
             networkService.getAccessToken { accessToken ->
                 if (accessToken != null) {
-                    Toast.makeText(requireContext(), "Access Token: $accessToken", Toast.LENGTH_LONG).show()
+                    // Use runOnUiThread to show the toast on the main thread
+                    activity?.runOnUiThread {
+                        Toast.makeText(requireContext(), "Access Token: $accessToken", Toast.LENGTH_LONG).show()
+                    }
                     searchSpotifyMusic(accessToken)
                 } else {
-                    Toast.makeText(requireContext(), "Error fetching token", Toast.LENGTH_SHORT).show()
+                    activity?.runOnUiThread {
+                        Toast.makeText(requireContext(), "Error fetching token", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
+
             uploadAudio()
         }
 
@@ -123,8 +129,7 @@ class FirstFragment : Fragment() {
 
 
     private fun searchSpotify(query: String) {
-        val authorizationToken = "Bearer BQCgti1Kjw-fDTX1o2yp5g3wZJHKoZDwOW-_brlrcWAzkc2Mly0TwvnaY4anBK6zL0aPchjPF6ssZYiLARtL40Z_txJkdFBukKldDSSAiNo7DlLwTrXs1KiJMJURoKeABwA6dok0lVI"
-
+        val authorizationToken = " "
         RetrofitClient.spotifyApiService.searchMusic(authorizationToken, query)
             .enqueue(object : Callback<SpotifySearchResponse> {
                 override fun onResponse(call: Call<SpotifySearchResponse>, response: Response<SpotifySearchResponse>) {
