@@ -174,12 +174,15 @@ class FirstFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PICK_AUDIO_REQUEST_CODE && resultCode == AppCompatActivity.RESULT_OK) {
             data?.data?.let { uri ->
-                // Use the getFileName method to ensure consistency
-                val fileName = getFileName(uri)
-                binding.audioFileName.text = fileName
-
-                Toast.makeText(requireContext(), "Audio Selected: $fileName", Toast.LENGTH_SHORT).show()
-                playAudio(uri)
+                try {
+                    val fileName = getFileName(uri)
+                    binding.audioFileName.text = fileName
+                    Toast.makeText(requireContext(), "Audio Selected: $fileName", Toast.LENGTH_SHORT).show()
+                    playAudio(uri)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    Toast.makeText(requireContext(), "Error processing file", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
