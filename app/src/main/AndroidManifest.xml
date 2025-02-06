@@ -32,6 +32,10 @@
             </intent-filter>
         </activity>
 
+        <!-- Declare LoginActivity -->
+        <activity android:name=".LoginActivity" />
+        <activity android:name=".SignupActivity" /> <!-- Make sure SignupActivity is declared -->
+
         <!-- MainActivity: No need to define MAIN/LAUNCHER here, since it's not the entry point -->
         <activity
             android:name=".MainActivity"
