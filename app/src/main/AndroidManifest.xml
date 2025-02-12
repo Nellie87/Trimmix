@@ -21,27 +21,27 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Trimmix"
         tools:targetApi="31">
-
+        <activity
+            android:name=".HomeActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Trimmix" />
         <!-- SplashActivity: This should be the entry point (launcher activity) -->
         <activity
             android:name=".SplashActivity"
             android:exported="true"> <!-- Optional: Create a custom splash screen theme -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- Declare LoginActivity -->
+        </activity> <!-- Declare LoginActivity -->
         <activity android:name=".LoginActivity" />
         <activity android:name=".SignupActivity" /> <!-- Make sure SignupActivity is declared -->
-
         <!-- MainActivity: No need to define MAIN/LAUNCHER here, since it's not the entry point -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.Trimmix">
-        </activity>
+            android:theme="@style/Theme.Trimmix"></activity>
     </application>
 
 </manifest>

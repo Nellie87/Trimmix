@@ -33,4 +33,10 @@
         android:textColor="@android:color/holo_blue_dark"
         android:gravity="center"/>
 
+    <!-- New Button to Navigate to FirstFragment -->
+    <Button
+        android:id="@+id/navigateToFirstFragmentButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Go to First Fragment" />
 </LinearLayout>

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "645354633362",
+    "project_id": "trimmix-dccf9",
+    "storage_bucket": "trimmix-dccf9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:645354633362:android:1acc1b1f90d40cf09e8e4b",
+        "android_client_info": {
+          "package_name": "com.example.trimmix"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcWYzfy4nt7ORoGrCfwCfECmj_Drhu2ys"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
